@@ -7,6 +7,8 @@
     "test": "vitest"
   },
   "dependencies": {
+    "@chevrotain/types": "^11.0.3",
+    "chevrotain": "^11.0.3",
     "next": "latest",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
