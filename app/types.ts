@@ -1,14 +1,12 @@
 // src/types.ts
-export interface Round {
-  id: number;
-  instructions: string;
+export interface PatternSequence {
+  sequenceNum: number;
+  instruction: string;
+  notes: string[];
+  position: {
+    line: number;
+    startCol: number;
+    endCol: number;
+  };
+  annotations: ("EndOfRound" | "EndOfGroup")[];
 }
-
-// src/types.ts
-export interface ProgressStep {
-    seq: number;
-    round: number;
-    instruction: string;
-    highlightPosition?: number;
-    highlightLength?: number;
-  }
