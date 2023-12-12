@@ -162,13 +162,14 @@ export default function Player(props: { patternId: string; pattern: Pattern }) {
   useKeypress(["ArrowLeft", "Backspace"], () => {
     backward();
   });
-  useKeypress(["ArrowRight", " "], () => {
+  useKeypress(["ArrowRight", " "], (e: KeyboardEvent) => {
+    e.preventDefault();
     forward();
   });
-  useKeypress(["Home"], () => {
+  useKeypress(["Home", 'H'], () => {
     setSeqNum(1);
   });
-  useKeypress(["End"], () => {
+  useKeypress(["End", 'E'], () => {
     setSeqNum(seqs.length);
   });
   const navStyles = {

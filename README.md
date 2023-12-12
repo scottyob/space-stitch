@@ -21,5 +21,6 @@ npm test
 ## Building
 ```
 sudo docker build -t scottyob/space-stitch .
+sudo docker push scottyob/space-stitch:latest
 ```
 
