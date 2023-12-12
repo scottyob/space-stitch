@@ -1,10 +1,15 @@
 import { redirect } from "next/navigation";
 import prisma from "../../../utils/prisma";
 import {headers} from "next/headers";
+import { isSuperuser } from "../../../server/access";
 
 export default async function Page({ params }: { params: { id: string[] } }) {
   async function updatePattern(formData: FormData) {
     "use server";
+
+    if(!isSuperuser()) {
+      throw new Error("Access Denied");
+    }
 
     const rawFormData = {
       patternId: formData.get("patternId") as string,
@@ -43,10 +48,6 @@ export default async function Page({ params }: { params: { id: string[] } }) {
   let pattern = "";
   let id = params.id?.[0] || undefined;
 
-  console.log("id", id)
-  console.log("Headers", headers());
-  console.table(Array.from(headers().entries()));
-
   if(id) {
     const patternObject = await prisma.pattern.findUnique({
       where: {
@@ -59,10 +60,7 @@ export default async function Page({ params }: { params: { id: string[] } }) {
       sequence = patternObject.currentSequence;
       pattern = patternObject.pattern;
     }
-
-
   }
-  // Fetch the pattern
 
   return (
     <form

@@ -159,10 +159,6 @@ class PatternParser extends EmbeddedActionsParser {
 
       return Object.fromEntries(roundItems.map((r) => [r, instructions]));
 
-      // uncomment the debugger statement and open dev tools in chrome/firefox
-      // to debug the parsing flow.
-      // debugger;
-      // return $.SUBRULE($.additionExpression);
     });
 
     $.RULE("RndNumber", () => {
@@ -204,6 +200,7 @@ class PatternParser extends EmbeddedActionsParser {
 
       // Build the objects, with information of it's position in the pattern
       for (let i = 1; i <= times; i++) {
+        // Build an object to insert
         const obj = {
           instruction: op.image,
           notes: [],
@@ -214,10 +211,22 @@ class PatternParser extends EmbeddedActionsParser {
           },
           annotations: [],
         };
+
         if (times > 1) {
           obj.notes.push(`Instruction: ${i} of ${times}`);
         }
-        instructions.push(obj);
+        
+        // Some instructions require multiple instructions
+        let objs = [];
+        switch(op.image) {
+          case "inc":
+            objs = [{...obj, instruction: "inc1"}, {...obj, instruction: "inc2"}];
+            break;
+          default:
+            objs = [obj];
+        }
+
+        instructions.push(...objs);
       }
       return instructions;
     });
