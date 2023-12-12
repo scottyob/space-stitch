@@ -5,7 +5,8 @@
     "build": "next build",
     "start": "next start",
     "test": "vitest",
-    "lint": "next lint"
+    "lint": "next lint",
+    "format": "prettier --write \"**/*.+(js|jsx|ts|tsx|json)\""
   },
   "prisma": {
     "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"

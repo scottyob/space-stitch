@@ -5,9 +5,9 @@ import * as PatternParse from "../../parse";
 import { PatternSequence } from "../../types";
 import { Pattern } from "@prisma/client";
 import { useLocalStorage } from "@uidotdev/usehooks";
-import useKeypress from 'react-use-keypress';
+import useKeypress from "react-use-keypress";
 
-export default function Player(props: { patternId: string, pattern: Pattern }) {
+export default function Player(props: { patternId: string; pattern: Pattern }) {
   let [seqNum, setSeqNum] = useLocalStorage(props.patternId, 1);
 
   const tableRefs = useRef(new Array());
@@ -48,7 +48,7 @@ export default function Player(props: { patternId: string, pattern: Pattern }) {
       var before = i.substring(0, seq.position.startCol - 1);
       var highlighted = i.substring(
         seq.position.startCol - 1,
-        seq.position.endCol
+        seq.position.endCol,
       );
       var after = i.substring(seq.position.endCol);
       content = (
@@ -65,7 +65,11 @@ export default function Player(props: { patternId: string, pattern: Pattern }) {
     }
 
     return (
-      <div key={index} className={style} ref={(e) => (instructionRefs.current[index] = e)}>
+      <div
+        key={index}
+        className={style}
+        ref={(e) => (instructionRefs.current[index] = e)}
+      >
         {content}
       </div>
     );
@@ -102,12 +106,12 @@ export default function Player(props: { patternId: string, pattern: Pattern }) {
         ref={(e) => (tableRefs.current[index] = e)}
       >
         {s.instruction}
-      </th>
+      </th>,
     );
     tableBody.push(
       <td key={s.sequenceNum} className={tableStyle}>
         {s.sequenceNum < seqNum ? "✅" : "."}
-      </td>
+      </td>,
     );
 
     if (s.annotations.indexOf("EndOfRound") !== -1) {
@@ -123,7 +127,7 @@ export default function Player(props: { patternId: string, pattern: Pattern }) {
           <tbody>
             <tr>{tableBody}</tr>
           </tbody>
-        </table>
+        </table>,
       );
       tableHead = [];
       tableBody = [];
@@ -142,16 +146,35 @@ export default function Player(props: { patternId: string, pattern: Pattern }) {
     });
   }, [seqNum, seqs]);
 
-useKeypress(['ArrowLeft', 'Backspace'], () => {
-  if(seqNum > 1) {
-    setSeqNum(seqNum - 1);
-}
-});
-useKeypress(['ArrowRight', ' '], () => {
-  if(seqNum < seqs.length) {
-    setSeqNum(seqNum + 1);
-}
-});
+  const forward = () => {
+    if (seqNum < seqs.length) {
+      setSeqNum(seqNum + 1);
+    }
+  };
+
+  const backward = () => {
+    if (seqNum > 1) {
+      setSeqNum(seqNum - 1);
+    }
+  };
+
+  useKeypress(["ArrowLeft", "Backspace"], () => {
+    backward();
+  });
+  useKeypress(["ArrowRight", " "], () => {
+    forward();
+  });
+  useKeypress(["Home"], () => {
+    setSeqNum(1);
+  });
+  useKeypress(["End"], () => {
+    setSeqNum(seqs.length);
+  });
+  const navStyles = {
+    disabled: "bg-gray-300 px-4 py-2 rounded-md cursor-not-allowed opacity-50",
+    enabled:
+      "bg-green-500 hover:bg-green-700 active:bg-green-800 px-4 py-2 rounded-md text-white",
+  };
 
   return (
     <div className="flex flex-col max-h-[100vh]">
@@ -183,11 +206,28 @@ useKeypress(['ArrowRight', ' '], () => {
       </div>
 
       {/* Table */}
-      <div className="flex flex-row px-16 pb-8 w-full overflow-hidden h-60">
+      <div className="flex flex-row px-16 w-full overflow-x-hidden h-72">
         {tables}
         <div className="min-w-[120px]" />
       </div>
 
+      {/* Back/Forward Buttons */}
+      <div className="flex flex-row h-60 text-5xl m-auto p-8 space-x-8 select-none">
+        <div
+          className={seqNum > 1 ? navStyles.enabled : navStyles.disabled}
+          onClick={backward}
+        >
+          ←
+        </div>
+        <div
+          className={
+            seqNum < seqs.length ? navStyles.enabled : navStyles.disabled
+          }
+          onClick={forward}
+        >
+          →
+        </div>
+      </div>
     </div>
   );
 }

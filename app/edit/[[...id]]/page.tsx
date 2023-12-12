@@ -1,13 +1,13 @@
 import { redirect } from "next/navigation";
 import prisma from "../../../utils/prisma";
-import {headers} from "next/headers";
+import { headers } from "next/headers";
 import { isSuperuser } from "../../../server/access";
 
 export default async function Page({ params }: { params: { id: string[] } }) {
   async function updatePattern(formData: FormData) {
     "use server";
 
-    if(!isSuperuser()) {
+    if (!isSuperuser()) {
       throw new Error("Access Denied");
     }
 
@@ -48,14 +48,14 @@ export default async function Page({ params }: { params: { id: string[] } }) {
   let pattern = "";
   let id = params.id?.[0] || undefined;
 
-  if(id) {
+  if (id) {
     const patternObject = await prisma.pattern.findUnique({
       where: {
-        id: Number.parseInt(id)
-      }
+        id: Number.parseInt(id),
+      },
     });
 
-    if(patternObject) {
+    if (patternObject) {
       title = patternObject.title;
       sequence = patternObject.currentSequence;
       pattern = patternObject.pattern;
@@ -84,7 +84,13 @@ export default async function Page({ params }: { params: { id: string[] } }) {
         />
 
         <label htmlFor="sequence">Sequence:</label>
-        <input type="number" id="sequence" name="sequence" defaultValue={sequence} required />
+        <input
+          type="number"
+          id="sequence"
+          name="sequence"
+          defaultValue={sequence}
+          required
+        />
         <button
           type="submit"
           className="rounded-md bg-indigo-600 p-2 ml-4 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"

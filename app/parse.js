@@ -158,7 +158,6 @@ class PatternParser extends EmbeddedActionsParser {
       let instructions = $.SUBRULE2($.atomicExpression);
 
       return Object.fromEntries(roundItems.map((r) => [r, instructions]));
-
     });
 
     $.RULE("RndNumber", () => {
@@ -215,12 +214,15 @@ class PatternParser extends EmbeddedActionsParser {
         if (times > 1) {
           obj.notes.push(`Instruction: ${i} of ${times}`);
         }
-        
+
         // Some instructions require multiple instructions
         let objs = [];
-        switch(op.image) {
+        switch (op.image) {
           case "inc":
-            objs = [{...obj, instruction: "inc1"}, {...obj, instruction: "inc2"}];
+            objs = [
+              { ...obj, instruction: "inc1" },
+              { ...obj, instruction: "inc2" },
+            ];
             break;
           default:
             objs = [obj];
@@ -238,7 +240,7 @@ class PatternParser extends EmbeddedActionsParser {
           $.OR([
             { ALT: () => $.SUBRULE($.instruction) },
             { ALT: () => $.SUBRULE($.parenthesisExpression) },
-          ])
+          ]),
         );
       });
       return instructions.flat();

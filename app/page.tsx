@@ -9,7 +9,7 @@ export default async function Index() {
 
   async function deleteProject(id: number) {
     "use server";
-    if(!isSuperuser()) {
+    if (!isSuperuser()) {
       throw new Error("Access denied");
     }
 

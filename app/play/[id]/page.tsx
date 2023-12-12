@@ -1,7 +1,9 @@
 import prisma from "../../../utils/prisma";
 import Player from "./player";
 
-export default async function PlayerContainer(props: { params: { id: string } }) {
+export default async function PlayerContainer(props: {
+  params: { id: string };
+}) {
   // Pull the pattern from the database
   const pattern = await prisma.pattern.findUniqueOrThrow({
     where: {
@@ -9,6 +11,5 @@ export default async function PlayerContainer(props: { params: { id: string } })
     },
   });
 
-  return <Player patternId={props.params.id} pattern={pattern} />
-
+  return <Player patternId={props.params.id} pattern={pattern} />;
 }
