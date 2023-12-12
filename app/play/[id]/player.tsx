@@ -5,6 +5,7 @@ import * as PatternParse from "../../parse";
 import { PatternSequence } from "../../types";
 import { Pattern } from "@prisma/client";
 import { useLocalStorage } from "@uidotdev/usehooks";
+// @ts-ignore
 import useKeypress from "react-use-keypress";
 
 export default function Player(props: { patternId: string; pattern: Pattern }) {
