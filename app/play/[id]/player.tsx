@@ -178,7 +178,7 @@ export default function Player(props: { patternId: string; pattern: Pattern }) {
   };
 
   return (
-    <div className="flex flex-col max-h-[100vh]">
+    <div className="flex flex-col max-h-[100dvh]">
       {/* Progress bar at the top*/}
       <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
         <div
@@ -207,7 +207,7 @@ export default function Player(props: { patternId: string; pattern: Pattern }) {
       </div>
 
       {/* Table */}
-      <div className="flex flex-row px-16 w-full overflow-x-hidden h-72">
+      <div className="flex flex-row px-16 w-full overflow-hidden h-72 min-h-[66px]">
         {tables}
         <div className="min-w-[120px]" />
       </div>

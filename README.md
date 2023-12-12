@@ -17,3 +17,9 @@ This is a really simple app to keep track of Crochet stitching.
 ```bash
 npm test
 ```
+
+## Building
+```
+sudo docker build -t scottyob/space-stitch .
+```
+
