@@ -4,11 +4,12 @@ import { useEffect, useRef, useState } from "react";
 import * as PatternParse from "../../parse";
 import { PatternSequence } from "../../types";
 import { Pattern } from "@prisma/client";
-import KeyboardEventHandler from "react-keyboard-event-handler";
 import { useLocalStorage } from "@uidotdev/usehooks";
+import useKeypress from 'react-use-keypress';
 
 export default function Player(props: { patternId: string, pattern: Pattern }) {
-  const [seqNum, setSeqNum] = useLocalStorage(props.patternId, 1);
+  let [seqNum, setSeqNum] = useLocalStorage(props.patternId, 1);
+
   const tableRefs = useRef(new Array());
   const instructionRefs = useRef(new Array());
 
@@ -21,7 +22,8 @@ export default function Player(props: { patternId: string, pattern: Pattern }) {
   parser.input = lexingResult.tokens;
   // @ts-expect-error
   const seqs = parser.pattern() as PatternSequence[];
-  const seq = seqs[seqNum - 1];
+  const seq = seqs[seqNum - 1] ?? seqs[0];
+  seqNum = seq.sequenceNum;
 
   // Build a list of instructions to show
   const lineClassStyles = {
@@ -63,7 +65,7 @@ export default function Player(props: { patternId: string, pattern: Pattern }) {
     }
 
     return (
-      <div className={style} ref={(e) => (instructionRefs.current[index] = e)}>
+      <div key={index} className={style} ref={(e) => (instructionRefs.current[index] = e)}>
         {content}
       </div>
     );
@@ -138,7 +140,18 @@ export default function Player(props: { patternId: string, pattern: Pattern }) {
       behavior: "smooth",
       block: "center",
     });
-  }, [seqNum]);
+  }, [seqNum, seqs]);
+
+useKeypress(['ArrowLeft', 'Backspace'], () => {
+  if(seqNum > 1) {
+    setSeqNum(seqNum - 1);
+}
+});
+useKeypress(['ArrowRight', ' '], () => {
+  if(seqNum < seqs.length) {
+    setSeqNum(seqNum + 1);
+}
+});
 
   return (
     <div className="flex flex-col max-h-[100vh]">
@@ -175,30 +188,6 @@ export default function Player(props: { patternId: string, pattern: Pattern }) {
         <div className="min-w-[120px]" />
       </div>
 
-      <KeyboardEventHandler
-        handleKeys={["space", "left", "right", "backspace", "home", "end"]}
-        onKeyEvent={(key) => {
-          let newSeqNum = 0;
-          if (key == "home") {
-            newSeqNum = 1;
-          } else if (key == "end") {
-            newSeqNum = seqs.length;
-          } else if (key == "left" || key == "backspace") {
-            newSeqNum = seqNum - 1;
-          } else {
-            newSeqNum = seqNum + 1;
-          }
-
-          if (
-            newSeqNum < 1 ||
-            newSeqNum > seqs.length ||
-            seqs?.[newSeqNum - 1] === undefined
-          ) {
-            return;
-          }
-          setSeqNum(newSeqNum);
-        }}
-      />
     </div>
   );
 }
