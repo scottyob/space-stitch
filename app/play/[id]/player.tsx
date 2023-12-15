@@ -8,6 +8,11 @@ import { useLocalStorage } from "@uidotdev/usehooks";
 // @ts-ignore
 import useKeypress from "react-use-keypress";
 
+const click = new Audio("/sounds/type.wav");
+const ding = new Audio("/sounds/ding.wav");
+const woosh = new Audio("/sounds/woosh.flac");
+
+
 export default function Player(props: { patternId: string; pattern: Pattern }) {
   let [seqNum, setSeqNum] = useLocalStorage(props.patternId, 1);
 
@@ -149,6 +154,13 @@ export default function Player(props: { patternId: string; pattern: Pattern }) {
 
   const forward = () => {
     if (seqNum < seqs.length) {
+      let snd = click;
+      if(seq.annotations.indexOf("EndOfRound") != -1) {
+        snd = ding;
+      }
+      snd.pause();
+      snd.currentTime = 0;
+      snd.play();
       setSeqNum(seqNum + 1);
     }
   };
@@ -156,6 +168,9 @@ export default function Player(props: { patternId: string; pattern: Pattern }) {
   const backward = () => {
     if (seqNum > 1) {
       setSeqNum(seqNum - 1);
+      woosh.pause();
+      woosh.currentTime = 0;
+      woosh.play();
     }
   };
 
