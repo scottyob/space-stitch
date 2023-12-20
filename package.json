@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@chevrotain/types": "^11.0.3",
+    "@monaco-editor/react": "^4.6.0",
     "@prisma/client": "^5.7.0",
     "@types/ip-address": "^7.0.0",
     "@types/react-keyboard-event-handler": "^1.5.4",
