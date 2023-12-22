@@ -1,24 +1,29 @@
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
+@import url('https://fonts.googleapis.com/css2?family=Crafty+Girls&family=Gluten&family=The+Girl+Next+Door&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  h1 {
+    @apply font-heading
+  }
+  h2 {
+    @apply font-heading
+  }
+  h3 {
+    @apply font-heading
+  }
+}
+
+
 html,
 body {
   padding: 0;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
   height: 100dvh;
   overscroll-behavior: none;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
+  font-size: larger; 
 }
 
 * {

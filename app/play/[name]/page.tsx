@@ -1,26 +1,68 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import * as PatternParse from "../../parse";
-import { PatternSequence } from "../../types";
-import { Pattern } from "@prisma/client";
+import {
+  AppStorage,
+  DefaultAppState,
+  Pattern,
+  PatternSequence,
+} from "../../types";
 import { useLocalStorage } from "@uidotdev/usehooks";
 // @ts-ignore
 import useKeypress from "react-use-keypress";
+import { kebabCase } from "lodash";
 
 const click = new Audio("/sounds/type.wav");
 const ding = new Audio("/sounds/ding.wav");
 const woosh = new Audio("/sounds/woosh.flac");
 
+export default function PlayerLoader(props: { params: { name: string } }) {
+  let [localStore, setLocalStore] = useLocalStorage<AppStorage>(
+    "stitch",
+    DefaultAppState
+  );
 
-export default function Player(props: { patternId: string; pattern: Pattern }) {
-  let [seqNum, setSeqNum] = useLocalStorage(props.patternId, 1);
+  const patternName = Object.keys(localStore.patterns).filter(
+    (x) => props.params.name == kebabCase(x)
+  )?.[0];
 
-  const tableRefs = useRef(new Array());
-  const instructionRefs = useRef(new Array());
+  if (!patternName) {
+    return (
+      <div className="h-screen flex items-center justify-center text-red-600">
+        Pattern not found
+      </div>
+    );
+  }
 
-  const pattern = props.pattern;
+  return (
+    <Player
+      pattern={localStore.patterns[patternName]}
+      localStore={localStore}
+      updateLocalStore={setLocalStore}
+      patternName={patternName}
+    />
+  );
+}
 
+function Player(props: {
+  pattern: Pattern;
+  localStore: AppStorage;
+  updateLocalStore: Dispatch<SetStateAction<AppStorage>>;
+  patternName: string;
+}) {
+  const { pattern, localStore, updateLocalStore, patternName } = props;
+
+  let seqNum = pattern.currentSeq;
+  const setSeqNum = (newNum: number) => {
+    const newStore = { ...localStore };
+    pattern.currentSeq = newNum;
+    newStore.patterns = { ...newStore.patterns, [patternName]: pattern };
+    updateLocalStore(newStore);
+  };
+
+
+  
   // Parse the instructions
   const lexer = PatternParse.PatternLexer;
   const parser = new PatternParse.PatternParser();
@@ -54,7 +96,7 @@ export default function Player(props: { patternId: string; pattern: Pattern }) {
       var before = i.substring(0, seq.position.startCol - 1);
       var highlighted = i.substring(
         seq.position.startCol - 1,
-        seq.position.endCol,
+        seq.position.endCol
       );
       var after = i.substring(seq.position.endCol);
       content = (
@@ -90,9 +132,9 @@ export default function Player(props: { patternId: string; pattern: Pattern }) {
 
   seqs.forEach((s, index) => {
     const tableStyles = {
-      all: "min-w-[40px] min-h-[40px] text-center align-middle border-r",
-      selected: "font-extrabold text-black",
-      unselected: "text-gray-600",
+      all: "min-w-[40px] min-h-[40px] text-center align-middle border-r pl-2 pr-2",
+      selected: "font-extrabold text-black text-xl",
+      unselected: "text-gray-500",
       endOfGroup: "border-r-2 border-r-gray-300",
     };
 
@@ -112,12 +154,12 @@ export default function Player(props: { patternId: string; pattern: Pattern }) {
         ref={(e) => (tableRefs.current[index] = e)}
       >
         {s.instruction}
-      </th>,
+      </th>
     );
     tableBody.push(
       <td key={s.sequenceNum} className={tableStyle}>
         {s.sequenceNum < seqNum ? "✅" : "."}
-      </td>,
+      </td>
     );
 
     if (s.annotations.indexOf("EndOfRound") !== -1) {
@@ -133,7 +175,7 @@ export default function Player(props: { patternId: string; pattern: Pattern }) {
           <tbody>
             <tr>{tableBody}</tr>
           </tbody>
-        </table>,
+        </table>
       );
       tableHead = [];
       tableBody = [];
@@ -155,7 +197,7 @@ export default function Player(props: { patternId: string; pattern: Pattern }) {
   const forward = () => {
     if (seqNum < seqs.length) {
       let snd = click;
-      if(seq.annotations.indexOf("EndOfRound") != -1) {
+      if (seq.annotations.indexOf("EndOfRound") != -1) {
         snd = ding;
       }
       snd.pause();
@@ -181,10 +223,10 @@ export default function Player(props: { patternId: string; pattern: Pattern }) {
     e.preventDefault();
     forward();
   });
-  useKeypress(["Home", 'H'], () => {
+  useKeypress(["Home", "H"], () => {
     setSeqNum(1);
   });
-  useKeypress(["End", 'E'], () => {
+  useKeypress(["End", "E"], () => {
     setSeqNum(seqs.length);
   });
   const navStyles = {
@@ -204,7 +246,7 @@ export default function Player(props: { patternId: string; pattern: Pattern }) {
       </div>
 
       {/* Text Instruction renderer */}
-      <div className="flex-grow overflow-hidden">
+      <div className="flex-grow overflow-hidden text-center">
         <div className="h-screen" />
         {instructions}
         <div className="h-screen" />
