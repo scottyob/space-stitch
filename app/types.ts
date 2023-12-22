@@ -8,7 +8,7 @@ export interface PatternSequence {
     startCol: number;
     endCol: number;
   };
-  annotations: ("EndOfRound" | "EndOfGroup")[];
+  annotations: ("EndOfRound" | "EndOfGroup" | "Grp")[];
 }
 
 export interface Pattern {

@@ -7,13 +7,15 @@ import {
   DefaultAppState,
   Pattern,
   PatternSequence,
+  ProgressMode,
 } from "../../types";
 import { useLocalStorage } from "@uidotdev/usehooks";
 // @ts-ignore
 import useKeypress from "react-use-keypress";
 import { kebabCase } from "lodash";
 import useSound from "use-sound";
-
+import { Popover } from "react-tiny-popover";
+import ProgressSettings from "./settings";
 
 export default function PlayerLoader(props: { params: { name: string } }) {
   let [localStore, setLocalStore] = useLocalStorage<AppStorage>(
@@ -204,23 +206,60 @@ function Player(props: {
   }, [seqNum, seqs]);
 
   const forward = () => {
-    if (seqNum < seqs.length) {
-      let snd = click;
-      if (seq.annotations.indexOf("EndOfRound") != -1) {
-        snd = ding;
+    let snd = click;
+    let newSeqNum = seqNum;
+    if (localStore.progressMode == ProgressMode.Round) {
+      do {
+        newSeqNum += 1;
+      } while (
+        seqNum < seqs.length &&
+        seqs[newSeqNum - 2].annotations.indexOf("EndOfRound") == -1
+      );
+    } else if (
+      localStore.progressMode == ProgressMode.Group &&
+      seq.annotations.indexOf("Grp") != -1
+    ) {
+      do {
+        newSeqNum += 1;
+      } while (
+        seqNum < seqs.length &&
+        seqs[newSeqNum - 2].annotations.indexOf("EndOfGroup") == -1
+      );
+    } else {
+      if (seqNum < seqs.length) {
+        if (seq.annotations.indexOf("EndOfRound") != -1) {
+          snd = ding;
+        }
+        newSeqNum = seqNum + 1;
       }
-      click();
-      setSeqNum(seqNum + 1);
     }
+    snd();
+    setSeqNum(newSeqNum);
   };
 
   const backward = () => {
-    if (seqNum > 1) {
-      setSeqNum(seqNum - 1);
+    let newSeqNum = seqNum - 1; // make this index based 0
+    switch (localStore.progressMode) {
+      case ProgressMode.Round:
+        newSeqNum -= 1;
+        while (
+          newSeqNum > 0 &&
+          seqs[newSeqNum - 1].annotations.indexOf("EndOfRound") == -1
+        ) {
+          newSeqNum -= 1;
+        }
+        break;
+      default:
+        newSeqNum -= 1;
+    }
+
+    if (newSeqNum >= 0 && newSeqNum != seqNum) {
+      setSeqNum(newSeqNum + 1); // Store as index base 1
       woosh();
     }
   };
 
+  // Navigation
   useKeypress(["ArrowLeft", "Backspace"], () => {
     backward();
   });
@@ -235,10 +274,14 @@ function Player(props: {
     setSeqNum(seqs.length);
   });
   const navStyles = {
-    disabled: "bg-gray-300 px-4 py-2 pt-4 rounded-md cursor-not-allowed opacity-50",
+    disabled:
+      "bg-gray-300 px-4 py-2 pt-4 rounded-md cursor-not-allowed opacity-50",
     enabled:
       "bg-green-500 hover:bg-green-700 active:bg-green-800 px-4 py-2 pt-4 rounded-md text-white",
   };
+
+  // Settings
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   return (
     <div className="flex flex-col max-h-[100dvh]">
@@ -270,27 +313,51 @@ function Player(props: {
       </div>
 
       {/* Table */}
-      <div className="flex flex-row px-16 w-full overflow-hidden h-72 min-h-[66px]">
+      <div className="flex flex-row px-16 w-full overflow-hidden h-72 min-h-[90px]">
         {tables}
         <div className="min-w-[120px]" />
       </div>
 
       {/* Back/Forward Buttons */}
-      <div className="flex flex-row h-60 text-5xl m-auto p-8 space-x-8 select-none">
-        <div
-          className={seqNum > 1 ? navStyles.enabled : navStyles.disabled}
-          onClick={backward}
-        >
-          ←
+      <div className="flex flex-row h-[150px]">
+        <div className="flex flex-row text-5xl m-auto p-8 space-x-8 select-none">
+          <div
+            className={seqNum > 1 ? navStyles.enabled : navStyles.disabled}
+            onClick={backward}
+          >
+            ←
+          </div>
+          <div
+            className={
+              seqNum < seqs.length ? navStyles.enabled : navStyles.disabled
+            }
+            onClick={forward}
+          >
+            →
+          </div>
         </div>
-        <div
-          className={
-            seqNum < seqs.length ? navStyles.enabled : navStyles.disabled
+        {/* Settings */}
+        <Popover
+          isOpen={settingsOpen}
+          content={
+            <ProgressSettings
+              progressMode={localStore.progressMode}
+              updateProgressMode={(p) => {
+                // Callback from settings to update the mode of which we progress
+                updateLocalStore({ ...localStore, progressMode: p });
+              }}
+            />
           }
-          onClick={forward}
         >
-          →
-        </div>
+          <div
+            onClick={() => {
+              setSettingsOpen(!settingsOpen);
+            }}
+            className="absolute bottom-0 right-0 rounded-md bg-gray-600 hover:bg-gray-700 active:bg-gray-800 p-2 pr-3 pl-3 m-4 text-white"
+          >
+            ⚙
+          </div>
+        </Popover>
       </div>
     </div>
   );
