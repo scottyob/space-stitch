@@ -12,10 +12,8 @@ import { useLocalStorage } from "@uidotdev/usehooks";
 // @ts-ignore
 import useKeypress from "react-use-keypress";
 import { kebabCase } from "lodash";
+import useSound from "use-sound";
 
-const click = new Audio("/sounds/type.wav");
-const ding = new Audio("/sounds/ding.wav");
-const woosh = new Audio("/sounds/woosh.flac");
 
 export default function PlayerLoader(props: { params: { name: string } }) {
   let [localStore, setLocalStore] = useLocalStorage<AppStorage>(
@@ -73,6 +71,11 @@ function Player(props: {
   const seqs = parser.pattern() as PatternSequence[];
   const seq = seqs[seqNum - 1] ?? seqs[0];
   seqNum = seq.sequenceNum;
+
+  // Sound effects
+  const [ding] = useSound("/sounds/ding.wav");
+  const [woosh] = useSound("/sounds/woosh.flac");
+  const [click] = useSound("/sounds/type.wav");
 
   // Build a list of instructions to show
   const lineClassStyles = {
@@ -206,9 +209,7 @@ function Player(props: {
       if (seq.annotations.indexOf("EndOfRound") != -1) {
         snd = ding;
       }
-      snd.pause();
-      snd.currentTime = 0;
-      snd.play();
+      click();
       setSeqNum(seqNum + 1);
     }
   };
@@ -216,9 +217,7 @@ function Player(props: {
   const backward = () => {
     if (seqNum > 1) {
       setSeqNum(seqNum - 1);
-      woosh.pause();
-      woosh.currentTime = 0;
-      woosh.play();
+      woosh();
     }
   };
 
