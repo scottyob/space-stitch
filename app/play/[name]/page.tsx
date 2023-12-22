@@ -61,8 +61,9 @@ function Player(props: {
     updateLocalStore(newStore);
   };
 
+  const tableRefs = useRef(new Array());
+  const instructionRefs = useRef(new Array());
 
-  
   // Parse the instructions
   const lexer = PatternParse.PatternLexer;
   const parser = new PatternParse.PatternParser();
@@ -133,15 +134,20 @@ function Player(props: {
   seqs.forEach((s, index) => {
     const tableStyles = {
       all: "min-w-[40px] min-h-[40px] text-center align-middle border-r pl-2 pr-2",
-      selected: "font-extrabold text-black text-xl",
-      unselected: "text-gray-500",
+      selected: "text-black font-black",
+      future: "text-gray-600",
+      past: "text-gray-300",
       endOfGroup: "border-r-2 border-r-gray-300",
     };
 
     let tableStyle =
       tableStyles.all +
       " " +
-      (seqNum == s.sequenceNum ? tableStyles.selected : tableStyles.unselected);
+      (seqNum == s.sequenceNum
+        ? tableStyles.selected
+        : s.sequenceNum < seqNum
+          ? tableStyles.past
+          : tableStyles.future);
 
     if (s.annotations.indexOf("EndOfGroup") !== -1) {
       tableStyle += " " + tableStyles.endOfGroup;
@@ -230,9 +236,9 @@ function Player(props: {
     setSeqNum(seqs.length);
   });
   const navStyles = {
-    disabled: "bg-gray-300 px-4 py-2 rounded-md cursor-not-allowed opacity-50",
+    disabled: "bg-gray-300 px-4 py-2 pt-4 rounded-md cursor-not-allowed opacity-50",
     enabled:
-      "bg-green-500 hover:bg-green-700 active:bg-green-800 px-4 py-2 rounded-md text-white",
+      "bg-green-500 hover:bg-green-700 active:bg-green-800 px-4 py-2 pt-4 rounded-md text-white",
   };
 
   return (
