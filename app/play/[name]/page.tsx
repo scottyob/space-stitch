@@ -138,11 +138,11 @@ function Player(props: {
 
   seqs.forEach((s, index) => {
     const tableStyles = {
-      all: "min-w-[40px] min-h-[40px] text-center align-middle border-r pl-2 pr-2",
+      all: "min-w-[80px] min-h-[40px] text-center align-middle border-r",
       selected: "text-black font-black",
-      future: "text-gray-600",
-      past: "text-gray-300",
-      endOfGroup: "border-r-2 border-r-gray-300",
+      future: "text-gray-600 font-normal",
+      past: "text-gray-300 font-normal",
+      endOfGroup: "border-r-4 border-r-gray-400",
     };
 
     let tableStyle =
@@ -178,7 +178,7 @@ function Player(props: {
       tables.push(
         <table
           key={tables.length}
-          className="table-fixed border border-gray-300 divide-x m-2 h-8"
+          className="table-fixed border border-gray-400 divide-x m-2 h-8"
         >
           <thead>
             <tr>{tableHead}</tr>
@@ -208,17 +208,19 @@ function Player(props: {
   const forward = () => {
     let snd = click;
     let newSeqNum = seqNum;
-    if (localStore.progressMode == ProgressMode.Round) {
-      do {
-        newSeqNum += 1;
-      } while (
-        seqNum < seqs.length &&
-        seqs[newSeqNum - 2].annotations.indexOf("EndOfRound") == -1
-      );
+    if (localStore.progressMode == ProgressMode.Stitch) {
+      // Progress one stitch
+      if (seqNum < seqs.length) {
+        if (seq.annotations.indexOf("EndOfRound") != -1) {
+          snd = ding;
+        }
+        newSeqNum = seqNum + 1;
+      }
     } else if (
       localStore.progressMode == ProgressMode.Group &&
       seq.annotations.indexOf("Grp") != -1
     ) {
+      // Progress one Group
       do {
         newSeqNum += 1;
       } while (
@@ -226,12 +228,13 @@ function Player(props: {
         seqs[newSeqNum - 2].annotations.indexOf("EndOfGroup") == -1
       );
     } else {
-      if (seqNum < seqs.length) {
-        if (seq.annotations.indexOf("EndOfRound") != -1) {
-          snd = ding;
-        }
-        newSeqNum = seqNum + 1;
-      }
+      // Progress one row (default to if we're not in a group)
+      do {
+        newSeqNum += 1;
+      } while (
+        seqNum < seqs.length &&
+        seqs[newSeqNum - 2].annotations.indexOf("EndOfRound") == -1
+      );
     }
     snd();
     setSeqNum(newSeqNum);
@@ -240,6 +243,19 @@ function Player(props: {
   const backward = () => {
     let newSeqNum = seqNum - 1; // make this index based 0
     switch (localStore.progressMode) {
+      case ProgressMode.Stitch:
+        newSeqNum -= 1;
+        break;
+      case ProgressMode.Group:
+        newSeqNum -= 1;
+        while (
+          newSeqNum > 0 &&
+          (seqs[newSeqNum - 1].annotations.indexOf("EndOfGroup") == -1 &&
+            seqs[newSeqNum - 1].annotations.indexOf("EndOfRound") == -1)
+        ) {
+          newSeqNum -= 1;
+        }
+        break;
       case ProgressMode.Round:
         newSeqNum -= 1;
         while (

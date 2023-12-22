@@ -18,7 +18,10 @@ export default function Index() {
       <div className="m-4 pl-4">
         <ul className="list-disc">
           {Object.keys(localStore.patterns).map((patternName) => {
-            const deleteMethod = () => {};
+            const deleteMethod = () => {
+              delete localStore.patterns[patternName];
+              setLocalStore(localStore);
+            };
 
             return (
               <li key={patternName}>
@@ -34,7 +37,7 @@ export default function Index() {
         </ul>
       </div>
 
-      <a href="/edit/" className="bg-blue-300 rounded-lg p-2 m-8">
+      <a href="/edit/new" className="bg-blue-300 rounded-lg p-2 m-8">
         New Project
       </a>
     </div>
