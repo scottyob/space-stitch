@@ -20,11 +20,11 @@ import ProgressSettings from "./settings";
 export default function PlayerLoader() {
   let [localStore, setLocalStore] = useLocalStorage<AppStorage>(
     "stitch",
-    DefaultAppState
+    DefaultAppState,
   );
 
   const patternName = Object.keys(localStore.patterns).filter(
-    (x) => window.location.hash.split("#")[1] == kebabCase(x)
+    (x) => window.location.hash.split("#")[1] == kebabCase(x),
   )?.[0];
 
   if (!patternName) {
@@ -102,7 +102,7 @@ function Player(props: {
       var before = i.substring(0, seq.position.startCol - 1);
       var highlighted = i.substring(
         seq.position.startCol - 1,
-        seq.position.endCol
+        seq.position.endCol,
       );
       var after = i.substring(seq.position.endCol);
       content = (
@@ -165,12 +165,12 @@ function Player(props: {
         ref={(e) => (tableRefs.current[index] = e)}
       >
         {s.instruction}
-      </th>
+      </th>,
     );
     tableBody.push(
       <td key={s.sequenceNum} className={tableStyle}>
         {s.sequenceNum < seqNum ? "✅" : "."}
-      </td>
+      </td>,
     );
 
     if (s.annotations.indexOf("EndOfRound") !== -1) {
@@ -186,7 +186,7 @@ function Player(props: {
           <tbody>
             <tr>{tableBody}</tr>
           </tbody>
-        </table>
+        </table>,
       );
       tableHead = [];
       tableBody = [];

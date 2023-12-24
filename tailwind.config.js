@@ -7,11 +7,9 @@ module.exports = {
   ],
   theme: {
     fontFamily: {
-      sans: ['Gluten', 'sans-serif'],
-      heading: ['Crafty Girls', 'sans-serif'],
-    }
+      sans: ["Gluten", "sans-serif"],
+      heading: ["Crafty Girls", "sans-serif"],
+    },
   },
-  plugins: [
-    require('@tailwindcss/typography')
-  ],
+  plugins: [require("@tailwindcss/typography")],
 };

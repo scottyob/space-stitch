@@ -18,15 +18,15 @@ export default function Page() {
   // Custom language created with: https://ohdarling88.medium.com/4-steps-to-add-custom-language-support-to-monaco-editor-5075eafa156d
   let [localStore, setLocalStore] = useLocalStorage<AppStorage>(
     "stitch",
-    DefaultAppState
+    DefaultAppState,
   );
 
   // Find the title for our URL
   let patternName = Object.keys(localStore.patterns).filter(
-    (x) => window.location.hash.split("#")[1] == kebabCase(x)
+    (x) => window.location.hash.split("#")[1] == kebabCase(x),
   )?.[0];
 
-  if(!patternName) {
+  if (!patternName) {
     patternName = window.location.hash.split("#")[1];
   }
 
@@ -41,7 +41,6 @@ export default function Page() {
   const [pattern, setPattern] = useState<PatternSequence[] | null>(null);
 
   const monacoRef = useRef(null);
-  const editorRef = useRef(null);
 
   const id = 0;
 
@@ -61,10 +60,9 @@ export default function Page() {
   const [title, setTitle] = useState(patternName);
   const [patternStr, setPatternStr] = useState(startingPattern?.pattern);
   const [seq, setSeq] = useState(startingPattern?.currentSeq ?? 1);
-  
-  
+
   const parsePattern = (text: string | undefined) => {
-    if(text === undefined) {
+    if (text === undefined) {
       return;
     }
 
@@ -96,17 +94,16 @@ export default function Page() {
     setPattern((parser.pattern() as PatternSequence[]) || null);
     setPatternStr(text);
   };
-  
 
   return (
     <form
       action={() => {
-        delete localStore.patterns[patternName]; //Delete our starting pattern 
-        localStore.patterns 
+        delete localStore.patterns[patternName]; //Delete our starting pattern
+        localStore.patterns;
         localStore.patterns[title] = {
           currentSeq: seq ?? 0,
-          pattern: patternStr ?? ""
-        }
+          pattern: patternStr ?? "",
+        };
         setLocalStore(localStore);
         redirect("/");
       }}
@@ -131,7 +128,9 @@ export default function Page() {
           name="title"
           className="flex-grow"
           defaultValue={patternName}
-          onChange={(e) => {setTitle(e.target.value)}}
+          onChange={(e) => {
+            setTitle(e.target.value);
+          }}
           required
         />
       </div>
@@ -147,7 +146,9 @@ export default function Page() {
           id="sequence"
           name="sequence"
           defaultValue={seq}
-          onChange={(e) => {setSeq(Number.parseInt(e.target.value))}}
+          onChange={(e) => {
+            setSeq(Number.parseInt(e.target.value));
+          }}
           required
         />
       </div>
@@ -178,13 +179,12 @@ export default function Page() {
           });
         }}
         onMount={(editor, monaco) => {
-          editorRef.current = editor;
+          // @ts-expect-error:  Yeah, no idea what the type should be here
           monacoRef.current = monaco;
           parsePattern(startingPattern?.pattern);
         }}
         language="pattern"
         onChange={parsePattern}
-        
       />
       <input type="hidden" name="patternId" defaultValue={id} />
     </form>

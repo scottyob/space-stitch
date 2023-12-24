@@ -3,7 +3,6 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "postinstall": "prisma generate",
     "start": "next start",
     "test": "vitest",
     "lint": "next lint",

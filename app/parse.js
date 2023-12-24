@@ -282,7 +282,7 @@ class PatternParser extends EmbeddedActionsParser {
           ret.push({
             ...e,
             notes: [`Repeat: ${i} of ${multiplication}`, ...e.notes],
-            annotations: ["Grp", ...e.annotations]
+            annotations: ["Grp", ...e.annotations],
           });
         });
       }
