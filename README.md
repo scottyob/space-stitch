@@ -1,12 +1,8 @@
 # Space Stitch
 
-This is a really simple app to keep track of Crochet stitching.
-
-
+[Access it HERE!](https://scottyob.github.io/space-stitch/).  This is a really simple app to keep track of Crochet stitching.
 
 https://github.com/scottyob/space-stitch/assets/1132154/f6e2df35-00db-47ca-a63a-27051a747b5f
-
-
 
 # Features
 - **Local Data**: Every data is stored in the window LocalStorage.  Nothing ever leaves your web browser.
