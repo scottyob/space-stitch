@@ -28,14 +28,14 @@ export default function Home() {
             return (
               <li key={patternName}>
                 <a
-                  href={`/space-stitch/play#${kebabCase(patternName)}`}
+                  href={`/play#${kebabCase(patternName)}`}
                   className="underline text-orange-500 decoration-orange-200"
                 >
                   {patternName}
                 </a>
                 <span className="text-xs">
                   {" - "}
-                  <a href={`/space-stitch/edit#${kebabCase(patternName)}`}>(edit)</a>
+                  <a href={`/edit#${kebabCase(patternName)}`}>(edit)</a>
                   <a onClick={deleteMethod}>{" (delete)"}</a>
                 </span>
               </li>
@@ -44,7 +44,7 @@ export default function Home() {
         </ul>
       </div>
 
-      <a href="/space-stitch/edit#new" className="bg-blue-300 rounded-lg p-2 m-8">
+      <a href="/edit#new" className="bg-blue-300 rounded-lg p-2 m-8">
         New Project
       </a>
     </div>
