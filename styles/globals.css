@@ -29,3 +29,8 @@ body {
 * {
   box-sizing: border-box;
 }
+
+.monaco-editor .editor-widget {
+  display: none !important;
+  visibility: hidden !important;
+}

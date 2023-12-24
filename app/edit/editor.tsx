@@ -1,19 +1,20 @@
 "use client";
 
 import { Editor } from "@monaco-editor/react";
-import { redirect } from "next/navigation";
+import { redirect, usePathname, useSearchParams } from "next/navigation";
 import { useRef, useState } from "react";
-import * as PatternParse from "../../parse";
+import * as PatternParse from "../parse";
 import {
   AppStorage,
   DefaultAppState,
   Pattern,
   PatternSequence,
-} from "../../types";
+} from "../types";
 import { useLocalStorage } from "@uidotdev/usehooks";
 import { kebabCase } from "lodash";
+import { useRouter } from "next/navigation";
 
-export default function Page(props: { params: { name: string } }) {
+export default function Page() {
   // Custom language created with: https://ohdarling88.medium.com/4-steps-to-add-custom-language-support-to-monaco-editor-5075eafa156d
   let [localStore, setLocalStore] = useLocalStorage<AppStorage>(
     "stitch",
@@ -21,9 +22,13 @@ export default function Page(props: { params: { name: string } }) {
   );
 
   // Find the title for our URL
-  const patternName = Object.keys(localStore.patterns).filter(
-    (x) => props.params.name == kebabCase(x)
+  let patternName = Object.keys(localStore.patterns).filter(
+    (x) => window.location.hash.split("#")[1] == kebabCase(x)
   )?.[0];
+
+  if(!patternName) {
+    patternName = window.location.hash.split("#")[1];
+  }
 
   let startingPattern: Pattern | null = null;
   if (patternName) {
@@ -39,8 +44,6 @@ export default function Page(props: { params: { name: string } }) {
   const editorRef = useRef(null);
 
   const id = 0;
-  const sequence = startingPattern?.currentSeq;
-  // className="flex-grow h-full w-full"
 
   const patternDesc =
     pattern && pattern.length > 0 ? (
@@ -57,7 +60,7 @@ export default function Page(props: { params: { name: string } }) {
   // States for new object information
   const [title, setTitle] = useState(patternName);
   const [patternStr, setPatternStr] = useState(startingPattern?.pattern);
-  const [seq, setSeq] = useState(startingPattern?.currentSeq);
+  const [seq, setSeq] = useState(startingPattern?.currentSeq ?? 1);
   
   
   const parsePattern = (text: string | undefined) => {
@@ -181,6 +184,7 @@ export default function Page(props: { params: { name: string } }) {
         }}
         language="pattern"
         onChange={parsePattern}
+        
       />
       <input type="hidden" name="patternId" defaultValue={id} />
     </form>

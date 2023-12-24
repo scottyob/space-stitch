@@ -1,4 +1,4 @@
-import { ProgressMode } from "../../types";
+import { ProgressMode } from "../types";
 
 export default function ProgressSettings(props: {
   progressMode: ProgressMode;

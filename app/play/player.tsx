@@ -1,14 +1,14 @@
 "use client";
 
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
-import * as PatternParse from "../../parse";
+import * as PatternParse from "../parse";
 import {
   AppStorage,
   DefaultAppState,
   Pattern,
   PatternSequence,
   ProgressMode,
-} from "../../types";
+} from "../types";
 import { useLocalStorage } from "@uidotdev/usehooks";
 // @ts-ignore
 import useKeypress from "react-use-keypress";
@@ -17,14 +17,14 @@ import useSound from "use-sound";
 import { Popover } from "react-tiny-popover";
 import ProgressSettings from "./settings";
 
-export default function PlayerLoader(props: { params: { name: string } }) {
+export default function PlayerLoader() {
   let [localStore, setLocalStore] = useLocalStorage<AppStorage>(
     "stitch",
     DefaultAppState
   );
 
   const patternName = Object.keys(localStore.patterns).filter(
-    (x) => props.params.name == kebabCase(x)
+    (x) => window.location.hash.split("#")[1] == kebabCase(x)
   )?.[0];
 
   if (!patternName) {
@@ -138,10 +138,10 @@ function Player(props: {
 
   seqs.forEach((s, index) => {
     const tableStyles = {
-      all: "min-w-[80px] min-h-[40px] text-center align-middle border-r",
-      selected: "text-black font-black",
-      future: "text-gray-600 font-normal",
-      past: "text-gray-300 font-normal",
+      all: "min-w-[40px] min-h-[40px] text-center align-middle border-r",
+      selected: "text-black font-black text-sm",
+      future: "text-gray-600 font-normal text-xs",
+      past: "text-gray-300 font-normal text-xs",
       endOfGroup: "border-r-4 border-r-gray-400",
     };
 
@@ -236,7 +236,9 @@ function Player(props: {
         seqs[newSeqNum - 2].annotations.indexOf("EndOfRound") == -1
       );
     }
-    snd();
+    if (newSeqNum != seqNum) {
+      snd();
+    }
     setSeqNum(newSeqNum);
   };
 
@@ -250,8 +252,8 @@ function Player(props: {
         newSeqNum -= 1;
         while (
           newSeqNum > 0 &&
-          (seqs[newSeqNum - 1].annotations.indexOf("EndOfGroup") == -1 &&
-            seqs[newSeqNum - 1].annotations.indexOf("EndOfRound") == -1)
+          seqs[newSeqNum - 1].annotations.indexOf("EndOfGroup") == -1 &&
+          seqs[newSeqNum - 1].annotations.indexOf("EndOfRound") == -1
         ) {
           newSeqNum -= 1;
         }
@@ -355,11 +357,13 @@ function Player(props: {
         {/* Settings */}
         <Popover
           isOpen={settingsOpen}
+          onClickOutside={() => setSettingsOpen(false)}
           content={
             <ProgressSettings
               progressMode={localStore.progressMode}
               updateProgressMode={(p) => {
                 // Callback from settings to update the mode of which we progress
+                setSettingsOpen(false);
                 updateLocalStore({ ...localStore, progressMode: p });
               }}
             />
@@ -369,7 +373,7 @@ function Player(props: {
             onClick={() => {
               setSettingsOpen(!settingsOpen);
             }}
-            className="absolute bottom-0 right-0 rounded-md bg-gray-600 hover:bg-gray-700 active:bg-gray-800 p-2 pr-3 pl-3 m-4 text-white"
+            className="absolute bottom-0 right-0 rounded-md bg-gray-600 hover:bg-gray-700 active:bg-gray-800 p-2 pr-3 pl-3 m-4 text-white text-center pt-3"
           >
             ⚙
           </div>

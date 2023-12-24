@@ -25,10 +25,10 @@ export default function Home() {
 
             return (
               <li key={patternName}>
-                <a href={`/play/${kebabCase(patternName)}`} className="underline text-orange-500 decoration-orange-200">{patternName}</a>
+                <a href={`/play#${kebabCase(patternName)}`} className="underline text-orange-500 decoration-orange-200">{patternName}</a>
                 <span className="text-xs">
                   {" - "}
-                  <a href={`/edit/${kebabCase(patternName)}`}>(edit)</a>
+                  <a href={`/edit#${kebabCase(patternName)}`}>(edit)</a>
                   <AComponent text={"(delete)"} onClick={() => {}} />
                 </span>
               </li>
@@ -37,7 +37,7 @@ export default function Home() {
         </ul>
       </div>
 
-      <a href="/edit/new" className="bg-blue-300 rounded-lg p-2 m-8">
+      <a href="/edit#new" className="bg-blue-300 rounded-lg p-2 m-8">
         New Project
       </a>
     </div>
