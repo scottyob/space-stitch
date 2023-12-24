@@ -3,4 +3,5 @@ module.exports = {
   // ... rest of the configuration.
   output: "export",
   trailingSlash: true,
+  basePath: "/space-stitch",
 };
